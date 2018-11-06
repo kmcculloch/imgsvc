@@ -6,7 +6,8 @@
         "slim/slim": "^3.11"
     },
     "require-dev": {
-        "phpspec/phpspec": "^5.1"
+        "phpspec/phpspec": "^5.1",
+        "squizlabs/php_codesniffer": "^3.3"
     },
     "license": "GPL-3.0+",
     "authors": [
