@@ -18,6 +18,8 @@ Once your container is running you'll find the image scale endpoint at `http://l
 
 `image` must match the name of one of the images in the `originals` folder (`chain.jpg`, `city.jpg` or `trail.jpg`).
 
+The application features some basic validation and error handling; feel free to muck around with the path arguments to see how it behaves.
+
 ## Development
 
 To enable real-time code editing and error reporting, run:
@@ -31,3 +33,9 @@ To lint, run:
 ```
 composer run phpcs
 ```
+
+## To Do
+
+* Install and configure phpspec for testing.
+* Replace the DavidePastore validation middleware library with our own validator and write tests.
+* Load configuration from environment rather than hard-coding paths in index.php

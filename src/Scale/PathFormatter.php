@@ -2,6 +2,11 @@
 
 namespace Imgsvc\Scale;
 
+/**
+ * @class PathFormatter
+ *
+ * Convert route parameters and application settings into image path arguments.
+ */
 class PathFormatter
 {
     protected $container;
@@ -18,13 +23,11 @@ class PathFormatter
 
     public function __invoke($req, $res, $next)
     {
-        $route = $req->getAttribute('route');
-
         list(
             'width' => $this->width,
             'height' => $this->height,
             'image' => $this->image,
-        ) = $route->getArguments();
+        ) = $req->getAttribute('route')->getArguments();
 
         list(
             'orig_path' => $this->origPath,
@@ -42,6 +45,9 @@ class PathFormatter
         return $next($req, $res);
     }
 
+    /**
+     * Full path to origin image.
+     */
     protected function origin()
     {
         return implode([
@@ -50,6 +56,9 @@ class PathFormatter
         ]);
     }
 
+    /**
+     * Path to storage directory for target image.
+     */
     protected function targetPath()
     {
         return implode([
@@ -62,6 +71,9 @@ class PathFormatter
         ]);
     }
 
+    /**
+     * Full path to target image.
+     */
     protected function target()
     {
         return implode([

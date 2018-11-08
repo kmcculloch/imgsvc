@@ -34,6 +34,12 @@ $validators = [
 ];
 $validationMiddleware = new Validation($validators);
 
+// If you're not familiar with Slim's middleware paradigm, know that the
+// original request will pass through each middleware handler starting with
+// the last one in the list. If a handler encounters an error it will
+// stop execution and send an error response bubbling back up. Otherwise the
+// request will continue to the next highest handler in the list until it
+// finally reaches the central response handler.
 $app->get(
     '/scale/w/{width}/h/{height}/{image}',
     \Imgsvc\Response\Image::class
