@@ -1,13 +1,12 @@
 <?php
 
 use DavidePastore\Slim\Validation\Validation;
-use Imgsvc\Scale\Controller as ScaleController;
 use Respect\Validation\Validator as v;
 use Slim\App;
 
 require '../vendor/autoload.php';
 
-// Configuration array. In a real-world app, we'd load these values from
+// Configuration array. In a real app, we'd load these values from
 // the local environment instead of hard coding them here.
 $config = [
     'settings' => [
@@ -16,28 +15,32 @@ $config = [
     ],
 ];
 
+if (getenv('SLIM_ENV') === 'dev') {
+    $config['settings']['displayErrorDetails'] = true;
+}
+
 $app = new App($config);
+$container = $app->getContainer();
 
-// 'Hello world'.
-$app->get('/', function ($request, $response, $args) {
-    return $response->withStatus(200)->write('Hello world');
-});
-
-// Some basic validation. I'm sure this isn't bulletproof; in a real-world
-// development effort we'd wrap validation in our own middleware class and write
-// a bunch of tests to guard against errors and attacks.
-$scaleValidator = v::numeric()->positive()->between(1, 2000);
-$imageValidator = v::regex('/^[a-zA-Z0-9]+(.jpg|.png)$/');
+// Set up a piece of middleware to do some basic route parameter validation.
+// I'm sure this isn't bulletproof; in a real app we'd wrap validation
+// in our own middleware class and write tests.
+$dimensionValidator = v::numeric()->positive()->between(1, 2000);
+$filenameValidator = v::regex('/^[a-zA-Z0-9]+(.jpg|.png)$/');
 $validators = [
-    'width' => $scaleValidator,
-    'height' => $scaleValidator,
-    'image' => $imageValidator,
+    'width' => $dimensionValidator,
+    'height' => $dimensionValidator,
+    'image' => $filenameValidator,
 ];
+$validationMiddleware = new Validation($validators);
 
-// Image scale endpoint.
 $app->get(
     '/scale/w/{width}/h/{height}/{image}',
-    ScaleController::class
-)->add(new Validation($validators));;
+    \Imgsvc\Response\Image::class
+)
+->add(\Imgsvc\Scale\ImageHandler::class)
+->add(new \Imgsvc\Scale\PathFormatter($container))
+->add(\Imgsvc\Middleware\ValidationHandler::class)
+->add($validationMiddleware);
 
 $app->run();
